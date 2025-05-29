@@ -31,8 +31,7 @@ describe('AI Code Review Action', () => {
   });
 
   it('should handle pull request review successfully', async () => {
-    // Mock GitHub context
-    // Use typeof github.context to get the type of the actual context object
+    // Mock GitHub context with all required properties for github.context
     const mockContext: typeof github.context = {
       eventName: 'pull_request',
       payload: {
@@ -41,8 +40,20 @@ describe('AI Code Review Action', () => {
           head: { sha: 'test-sha' }
         }
       },
-      repo: { owner: 'test-owner', repo: 'test-repo' }
-    } as typeof github.context; // Cast to the type of github.context
+      repo: { owner: 'test-owner', repo: 'test-repo' },
+      sha: 'test-sha', // Added missing property
+      ref: 'refs/pull/1/head', // Added missing property
+      workflow: 'test-workflow', // Added missing property
+      action: 'test-action', // Added missing property
+      actor: 'test-actor', // Added missing property
+      runId: 123, // Added missing property
+      runNumber: 1, // Added missing property
+      apiUrl: 'https://api.github.com', // Added missing property
+      serverUrl: 'https://github.com', // Added missing property
+      graphqlUrl: 'https://api.github.com/graphql', // Added missing property
+      issue: { owner: 'test-owner', repo: 'test-repo', number: 1 }, // Added missing property
+      job: 'test-job', // Added missing property
+    };
 
     // Mock Octokit responses with all necessary properties for the type
     const mockOctokit: GitHubClient = { // Explicitly type mockOctokit
@@ -129,8 +140,20 @@ describe('AI Code Review Action', () => {
         after: 'after-sha',
         repository: { name: 'test-repo', owner: { login: 'test-owner' } }
       },
-      repo: { owner: 'test-owner', repo: 'test-repo' }
-    } as typeof github.context; // Cast to the type of github.context
+      repo: { owner: 'test-owner', repo: 'test-repo' },
+      sha: 'after-sha', // Added missing property
+      ref: 'refs/heads/main', // Added missing property
+      workflow: 'test-workflow', // Added missing property
+      action: 'test-action', // Added missing property
+      actor: 'test-actor', // Added missing property
+      runId: 456, // Added missing property
+      runNumber: 2, // Added missing property
+      apiUrl: 'https://api.github.com', // Added missing property
+      serverUrl: 'https://github.com', // Added missing property
+      graphqlUrl: 'https://api.github.com/graphql', // Added missing property
+      issue: { owner: 'test-owner', repo: 'test-repo', number: 1 }, // Added missing property
+      job: 'test-job', // Added missing property
+    };
 
     const mockOctokit: GitHubClient = { // Explicitly type mockOctokit
       rest: {
@@ -209,8 +232,20 @@ describe('AI Code Review Action', () => {
     const mockContext: typeof github.context = { // Cast to the type of github.context
       eventName: 'pull_request',
       payload: { pull_request: { number: 1, head: { sha: 'test-sha' } } },
-      repo: { owner: 'test-owner', repo: 'test-repo' }
-    } as typeof github.context; // Cast to the type of github.context
+      repo: { owner: 'test-owner', repo: 'test-repo' },
+      sha: 'test-sha', // Added missing property
+      ref: 'refs/pull/1/head', // Added missing property
+      workflow: 'test-workflow', // Added missing property
+      action: 'test-action', // Added missing property
+      actor: 'test-actor', // Added missing property
+      runId: 789, // Added missing property
+      runNumber: 3, // Added missing property
+      apiUrl: 'https://api.github.com', // Added missing property
+      serverUrl: 'https://github.com', // Added missing property
+      graphqlUrl: 'https://api.github.com/graphql', // Added missing property
+      issue: { owner: 'test-owner', repo: 'test-repo', number: 1 }, // Added missing property
+      job: 'test-job', // Added missing property
+    };
 
     const mockOctokit: GitHubClient = { // Explicitly type mockOctokit
       rest: {
