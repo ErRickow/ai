@@ -13,12 +13,18 @@ jest.mock('@actions/github');
 // Mock the CustomEndpointProvider module to control its behavior
 jest.mock('../src/providers/custom');
 
+// Explicitly define and assign the mock functions from @actions/core
+// This ensures Jest has full control over them and they are properly reset.
+const mockGetInput = jest.fn();
+const mockSetFailed = jest.fn();
+const mockInfo = jest.fn(); // Define mockInfo as a jest.fn()
+(core.getInput as jest.Mock) = mockGetInput; // Assign the mock to core.getInput
+(core.setFailed as jest.Mock) = mockSetFailed; // Assign the mock to core.setFailed
+(core.info as jest.Mock) = mockInfo; // Assign the mock to core.info
+
+
 describe('AI Code Review Action', () => {
-  // Cast mock functions to their correct types for better type inference
-  const mockGetInput = core.getInput as jest.MockedFunction<typeof core.getInput>;
-  const mockSetFailed = core.setFailed as jest.MockedFunction<typeof core.setFailed>;
-  // Explicitly ensure core.info is a Jest mock function
-  const mockInfo = core.info as jest.MockedFunction<typeof core.info>; 
+  // Use the explicitly defined mock functions
   const mockGetOctokit = github.getOctokit as jest.MockedFunction<typeof github.getOctokit>;
 
   // Mock the CustomEndpointProvider constructor and its reviewCode method
@@ -30,7 +36,7 @@ describe('AI Code Review Action', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.clearAllMocks(); // This will clear all calls and reset mock implementations
     
     // Reset mock implementations for each test
     mockGetInput.mockImplementation((name: string) => {
