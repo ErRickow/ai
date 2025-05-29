@@ -1,32 +1,47 @@
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 import { BaseProvider } from './base';
 
 export class OpenAIProvider implements BaseProvider {
-  private openai: OpenAIApi;
+  private openai: OpenAI;
 
   constructor(apiKey: string, customEndpoint?: string) {
-    const configuration = new Configuration({
-      apiKey,
-      basePath: customEndpoint,
+    this.openai = new OpenAI({
+      apiKey: apiKey,
+      ...(customEndpoint && { baseOptions: { baseURL: customEndpoint } }),
     });
-    this.openai = new OpenAIApi(configuration);
   }
 
   async reviewCode(code: string): Promise<string> {
-    const response = await this.openai.createChatCompletion({
-      model: 'gpt-4',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a code reviewer. Review the following code and provide constructive feedback.',
-        },
-        {
-          role: 'user',
-          content: code,
-        },
-      ],
-    });
+    try {
+      // Potong kode jika terlalu panjang
+      const truncatedCode = code.length > 8000 
+        ? code.substring(0, 8000) + '... [truncated]' 
+        : code;
 
-    return response.data.choices[0]?.message?.content || 'No feedback provided';
+      const response = await this.openai.chat.completions.create({
+        model: 'gpt-4',
+        messages: [
+          {
+            role: 'system',
+            content: 'Anda adalah reviewer kode profesional. Berikan feedback yang:\n' +
+                     '- Jelas dan konstruktif\n' +
+                     '- Fokus pada kualitas kode\n' +
+                     '- Sertakan contoh perbaikan jika perlu\n' +
+                     '- Flag potensi bug/security issue',
+          },
+          {
+            role: 'user',
+            content: `Review kode berikut:\n\`\`\`\n${truncatedCode}\n\`\`\``,
+          },
+        ],
+        temperature: 0.3,
+        max_tokens: 1000,
+      });
+
+      return response.choices[0]?.message?.content || 'Tidak ada feedback yang diberikan';
+    } catch (error) {
+      console.error('Error dalam review kode:', error);
+      throw new Error(`Gagal mendapatkan review: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 }
