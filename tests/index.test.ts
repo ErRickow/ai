@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { run } from '../src/index';
 import type { Context } from '@actions/github/lib/context';
-import type { WebhookPayload } from '@actions/github/lib/interfaces';
+// import type { WebhookPayload } from '@actions/github/lib/interfaces';
 
 jest.mock('@actions/core');
 jest.mock('@actions/github');
