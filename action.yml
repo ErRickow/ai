@@ -1,0 +1,45 @@
+name: 'AI Code Review'
+description: 'AI-powered code review supporting custom endpoints and multiple providers'
+author: 'ErRickow'
+
+inputs:
+  provider:
+    description: 'AI provider to use (openai, gemini, or custom)'
+    required: false
+    default: 'gemini'
+  
+  custom_endpoint:
+    description: 'Custom endpoint URL (e.g., https://api.example.com/chat)'
+    required: false
+  
+  custom_endpoint_param:
+    description: 'Query parameter name for custom endpoint (default: text)'
+    required: false
+    default: 'text'
+  
+  custom_endpoint_headers:
+    description: 'JSON string of headers for custom endpoint'
+    required: false
+  
+  github_token:
+    description: 'GitHub token for API access'
+    required: true
+    default: ${{ github.token }}
+  
+  review_type:
+    description: 'What to review (push, pr, or issue)'
+    required: false
+    default: 'push'
+
+  max_files:
+    description: 'Maximum number of files to review'
+    required: false
+    default: '10'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
+
+branding:
+  icon: 'eye'
+  color: 'blue'
