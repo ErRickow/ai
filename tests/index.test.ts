@@ -18,7 +18,7 @@ describe('AI Code Review Action', () => {
   // These will be assigned in beforeEach to ensure they point to the current mocks.
   let mockGetInput: jest.MockedFunction<typeof core.getInput>;
   let mockSetFailed: jest.MockedFunction<typeof core.setFailed>;
-  let mockInfo: jest.MockedFunction<typeof core.info>;
+ // let mockInfo: jest.MockedFunction<typeof core.info>;
   let mockGetOctokit: jest.MockedFunction<typeof github.getOctokit>;
 
   // Mock the CustomEndpointProvider constructor and its reviewCode method
