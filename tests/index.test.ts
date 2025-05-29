@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { run } from '../src/index';
 import type { Context } from '@actions/github/lib/context';
-import type { Octokit } from '@actions/github/lib/octokit'; // Import Octokit type
+//import type { Octokit } from '@actions/github/lib/octokit'; // Import Octokit type
 
 jest.mock('@actions/core');
 jest.mock('@actions/github');
