@@ -1,7 +1,8 @@
+import { GoogleGenerativeAI, type GenerativeModel, type SafetySetting, type GenerationConfig, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { BaseProvider } from './base';
-import { GoogleGenerativeAI, type GenerativeModel } from '@google/generative-ai';
 
 export class GeminiProvider implements BaseProvider {
+  private genAI: GoogleGenerativeAI; // Declare genAI property
   private model: GenerativeModel;
   
   constructor(apiKey?: string, options: {
