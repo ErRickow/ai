@@ -1,5 +1,5 @@
 {
-  "name": "ai-code-review",
+  "name": "ai",
   "version": "1.0.0",
   "description": "AI-powered code review GitHub Action with custom endpoint support",
   "main": "dist/index.js",
