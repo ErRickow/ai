@@ -33,7 +33,7 @@ jobs:
         run: npm run build
       
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # Updated to v4
         with:
           name: dist
           path: dist/
@@ -42,19 +42,20 @@ jobs:
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: write
+      
     steps:
       - uses: actions/checkout@v4
       
       - name: Download build artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist/
       
       - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+        uses: actions/create-release@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
