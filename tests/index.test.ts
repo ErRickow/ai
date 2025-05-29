@@ -48,6 +48,7 @@ describe('AI Code Review Action', () => {
       actor: 'test-actor', // Added missing property
       runId: 123, // Added missing property
       runNumber: 1, // Added missing property
+      runAttempt: 1, // Added missing property
       apiUrl: 'https://api.github.com', // Added missing property
       serverUrl: 'https://github.com', // Added missing property
       graphqlUrl: 'https://api.github.com/graphql', // Added missing property
@@ -148,6 +149,7 @@ describe('AI Code Review Action', () => {
       actor: 'test-actor', // Added missing property
       runId: 456, // Added missing property
       runNumber: 2, // Added missing property
+      runAttempt: 1, // Added missing property
       apiUrl: 'https://api.github.com', // Added missing property
       serverUrl: 'https://github.com', // Added missing property
       graphqlUrl: 'https://api.github.com/graphql', // Added missing property
@@ -240,6 +242,7 @@ describe('AI Code Review Action', () => {
       actor: 'test-actor', // Added missing property
       runId: 789, // Added missing property
       runNumber: 3, // Added missing property
+      runAttempt: 1, // Added missing property
       apiUrl: 'https://api.github.com', // Added missing property
       serverUrl: 'https://github.com', // Added missing property
       graphqlUrl: 'https://api.github.com/graphql', // Added missing property
