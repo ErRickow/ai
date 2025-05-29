@@ -19,7 +19,7 @@ describe('AI Code Review Action', () => {
   // Using 'let' allows them to be reassigned in beforeEach.
   let mockGetInput: jest.MockedFunction<typeof core.getInput>;
   let mockSetFailed: jest.MockedFunction<typeof core.setFailed>;
-  let mockInfo: jest.MockedFunction<typeof core.info>; // Re-declare mockInfo
+  // Removed mockInfo as it's no longer used in the remaining tests
   let mockGetOctokit: jest.MockedFunction<typeof github.getOctokit>;
 
   // Mock the CustomEndpointProvider constructor and its reviewCode method
@@ -39,7 +39,7 @@ describe('AI Code Review Action', () => {
     // We explicitly cast them to JestMockedFunction to ensure correct typing.
     mockGetInput = core.getInput as jest.MockedFunction<typeof core.getInput>;
     mockSetFailed = core.setFailed as jest.MockedFunction<typeof core.setFailed>;
-    mockInfo = core.info as jest.MockedFunction<typeof core.info>; 
+    // Removed assignment for mockInfo
     mockGetOctokit = github.getOctokit as jest.MockedFunction<typeof github.getOctokit>;
     
     // Default mock implementations for inputs
