@@ -32,7 +32,8 @@ describe('AI Code Review Action', () => {
 
   it('should handle pull request review successfully', async () => {
     // Mock GitHub context
-    const mockContext = {
+    // Use typeof github.context to get the type of the actual context object
+    const mockContext: typeof github.context = {
       eventName: 'pull_request',
       payload: {
         pull_request: {
@@ -41,7 +42,7 @@ describe('AI Code Review Action', () => {
         }
       },
       repo: { owner: 'test-owner', repo: 'test-repo' }
-    } as unknown as github.Context; // Use github.Context directly
+    } as typeof github.context; // Cast to the type of github.context
 
     // Mock Octokit responses with all necessary properties for the type
     const mockOctokit: GitHubClient = { // Explicitly type mockOctokit
@@ -95,7 +96,7 @@ describe('AI Code Review Action', () => {
     } as unknown as GitHubClient; // Final cast to ensure compatibility
 
     // Apply mocks
-    (github.context as github.Context) = mockContext;
+    (github.context as typeof github.context) = mockContext; // Cast to the type of github.context
     mockGetOctokit.mockReturnValue(mockOctokit);
 
     await run();
@@ -121,7 +122,7 @@ describe('AI Code Review Action', () => {
   });
 
   it('should handle push event review', async () => {
-    const mockContext = {
+    const mockContext: typeof github.context = { // Cast to the type of github.context
       eventName: 'push',
       payload: {
         before: 'before-sha',
@@ -129,7 +130,7 @@ describe('AI Code Review Action', () => {
         repository: { name: 'test-repo', owner: { login: 'test-owner' } }
       },
       repo: { owner: 'test-owner', repo: 'test-repo' }
-    } as unknown as github.Context;
+    } as typeof github.context; // Cast to the type of github.context
 
     const mockOctokit: GitHubClient = { // Explicitly type mockOctokit
       rest: {
@@ -182,7 +183,7 @@ describe('AI Code Review Action', () => {
       paginate: jest.fn(), // Add paginate property
     } as unknown as GitHubClient; // Final cast to ensure compatibility
 
-    (github.context as github.Context) = mockContext;
+    (github.context as typeof github.context) = mockContext; // Cast to the type of github.context
     mockGetOctokit.mockReturnValue(mockOctokit);
 
     await run();
@@ -205,11 +206,11 @@ describe('AI Code Review Action', () => {
   });
 
   it('should handle empty file list', async () => {
-    const mockContext = {
+    const mockContext: typeof github.context = { // Cast to the type of github.context
       eventName: 'pull_request',
       payload: { pull_request: { number: 1, head: { sha: 'test-sha' } } },
       repo: { owner: 'test-owner', repo: 'test-repo' }
-    } as unknown as github.Context;
+    } as typeof github.context; // Cast to the type of github.context
 
     const mockOctokit: GitHubClient = { // Explicitly type mockOctokit
       rest: {
@@ -249,7 +250,7 @@ describe('AI Code Review Action', () => {
       paginate: jest.fn(), // Add paginate property
     } as unknown as GitHubClient; // Final cast to ensure compatibility
 
-    (github.context as github.Context) = mockContext;
+    (github.context as typeof github.context) = mockContext; // Cast to the type of github.context
     mockGetOctokit.mockReturnValue(mockOctokit);
 
     await run();
