@@ -16,9 +16,10 @@ jest.mock('../src/providers/custom');
 describe('AI Code Review Action', () => {
   // Declare variables to hold the mocked functions.
   // These will be assigned in beforeEach to ensure they point to the current mocks.
+  // Using 'let' allows them to be reassigned in beforeEach.
   let mockGetInput: jest.MockedFunction<typeof core.getInput>;
   let mockSetFailed: jest.MockedFunction<typeof core.setFailed>;
- // let mockInfo: jest.MockedFunction<typeof core.info>;
+  let mockInfo: jest.MockedFunction<typeof core.info>; // Re-declare mockInfo
   let mockGetOctokit: jest.MockedFunction<typeof github.getOctokit>;
 
   // Mock the CustomEndpointProvider constructor and its reviewCode method
@@ -35,9 +36,10 @@ describe('AI Code Review Action', () => {
 
     // Assign the references to the actual mocked functions from the 'core' module.
     // This is crucial because jest.mock replaces the module's exports with mocks.
+    // We explicitly cast them to JestMockedFunction to ensure correct typing.
     mockGetInput = core.getInput as jest.MockedFunction<typeof core.getInput>;
     mockSetFailed = core.setFailed as jest.MockedFunction<typeof core.setFailed>;
-    mockInfo = core.info as jest.MockedFunction<typeof core.info>; // Now correctly typed and referenced
+    mockInfo = core.info as jest.MockedFunction<typeof core.info>; 
     mockGetOctokit = github.getOctokit as jest.MockedFunction<typeof github.getOctokit>;
     
     // Default mock implementations for inputs
