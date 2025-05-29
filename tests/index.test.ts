@@ -75,7 +75,7 @@ describe('AI Code Review Action', () => {
       auth: {
         hook: jest.fn(),
       },
-    } as unknown as Octokit; // Cast to Octokit
+    } as unknown // as Octokit; // Cast to Octokit
 
     // Apply mocks
     (github.context as Context) = mockContext;
@@ -149,7 +149,7 @@ describe('AI Code Review Action', () => {
       auth: {
         hook: jest.fn(),
       },
-    } as unknown as Octokit; // Cast to Octokit
+    } as unknown // as Octokit; // Cast to Octokit
 
     (github.context as Context) = mockContext;
     mockGetOctokit.mockReturnValue(mockOctokit);
@@ -204,7 +204,7 @@ describe('AI Code Review Action', () => {
       auth: {
         hook: jest.fn(),
       },
-    } as unknown as Octokit; // Cast to Octokit
+    } as unknown // as Octokit; // Cast to Octokit
 
     (github.context as Context) = mockContext;
     mockGetOctokit.mockReturnValue(mockOctokit);
