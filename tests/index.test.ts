@@ -1,24 +1,37 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { run } from '../src/index';
+import { CustomEndpointProvider } from '../src/providers/custom'; // Import the actual class to mock its methods
 
 // Get the actual return type of github.getOctokit to ensure our mock matches it
 type GitHubClient = ReturnType<typeof github.getOctokit>;
 
+// Mock the entire @actions/core module
 jest.mock('@actions/core');
+// Mock the entire @actions/github module
 jest.mock('@actions/github');
-jest.mock('../src/providers/custom'); // Mock your AI provider
+// Mock the CustomEndpointProvider module to control its behavior
+jest.mock('../src/providers/custom');
 
 describe('AI Code Review Action', () => {
   // Cast mock functions to their correct types for better type inference
   const mockGetInput = core.getInput as jest.MockedFunction<typeof core.getInput>;
-  const mockSetFailed = core.setFailed as jest.MockedFunction<typeof core.setFailed>;
+  const mockSetFailed = core.MockedFunction<typeof core.setFailed>; // Corrected type
+  const mockInfo = core.info as jest.MockedFunction<typeof core.info>; // Mock core.info
   const mockGetOctokit = github.getOctokit as jest.MockedFunction<typeof github.getOctokit>;
+
+  // Mock the CustomEndpointProvider constructor and its reviewCode method
+  const mockReviewCode = jest.fn();
+  (CustomEndpointProvider as jest.Mock).mockImplementation(() => {
+    return {
+      reviewCode: mockReviewCode,
+    };
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
     
-    // Default mock implementations
+    // Reset mock implementations for each test
     mockGetInput.mockImplementation((name: string) => {
       switch (name) {
         case 'custom_endpoint': return 'https://er-api.biz.id/luminai';
@@ -28,6 +41,9 @@ describe('AI Code Review Action', () => {
         default: return '';
       }
     });
+
+    // Default mock for reviewCode to return a string
+    mockReviewCode.mockResolvedValue('Mocked review feedback');
   });
 
   it('should handle pull request review successfully', async () => {
@@ -41,23 +57,23 @@ describe('AI Code Review Action', () => {
         }
       },
       repo: { owner: 'test-owner', repo: 'test-repo' },
-      sha: 'test-sha', // Added missing property
-      ref: 'refs/pull/1/head', // Added missing property
-      workflow: 'test-workflow', // Added missing property
-      action: 'test-action', // Added missing property
-      actor: 'test-actor', // Added missing property
-      runId: 123, // Added missing property
-      runNumber: 1, // Added missing property
-      runAttempt: 1, // Added missing property
-      apiUrl: 'https://api.github.com', // Added missing property
-      serverUrl: 'https://github.com', // Added missing property
-      graphqlUrl: 'https://api.github.com/graphql', // Added missing property
-      issue: { owner: 'test-owner', repo: 'test-repo', number: 1 }, // Added missing property
-      job: 'test-job', // Added missing property
+      sha: 'test-sha', 
+      ref: 'refs/pull/1/head', 
+      workflow: 'test-workflow', 
+      action: 'test-action', 
+      actor: 'test-actor', 
+      runId: 123, 
+      runNumber: 1, 
+      runAttempt: 1, 
+      apiUrl: 'https://api.github.com', 
+      serverUrl: 'https://github.com', 
+      graphqlUrl: 'https://api.github.com/graphql', 
+      issue: { owner: 'test-owner', repo: 'test-repo', number: 1 }, 
+      job: 'test-job', 
     };
 
     // Mock Octokit responses with all necessary properties for the type
-    const mockOctokit: GitHubClient = { // Explicitly type mockOctokit
+    const mockOctokit: GitHubClient = { 
       rest: {
         pulls: {
           listFiles: jest.fn().mockResolvedValue({
@@ -70,23 +86,17 @@ describe('AI Code Review Action', () => {
             ]
           }),
           createReviewComment: jest.fn().mockResolvedValue({}),
-          // Add other methods that might be called, even if empty mocks
           get: jest.fn(),
           update: jest.fn(),
-          // ... add other pull request methods if needed by the code under test
         },
-        // Add minimal mocks for other top-level Octokit properties
         repos: {
           compareCommits: jest.fn(),
           createCommitComment: jest.fn(),
-          // ... add other repo methods if needed
         },
         issues: {
           createComment: jest.fn(),
-          // ... add other issue methods if needed
         },
       },
-      // Minimal mocks for other properties of the Octokit instance
       request: jest.fn(),
       graphql: jest.fn(),
       log: {
@@ -104,11 +114,11 @@ describe('AI Code Review Action', () => {
       auth: {
         hook: jest.fn(),
       },
-      paginate: jest.fn(), // Add paginate property
-    } as unknown as GitHubClient; // Final cast to ensure compatibility
+      paginate: jest.fn(), 
+    } as unknown as GitHubClient; 
 
     // Apply mocks
-    (github.context as typeof github.context) = mockContext; // Cast to the type of github.context
+    (github.context as typeof github.context) = mockContext; 
     mockGetOctokit.mockReturnValue(mockOctokit);
 
     await run();
@@ -120,6 +130,8 @@ describe('AI Code Review Action', () => {
       pull_number: 1
     });
 
+    expect(mockReviewCode).toHaveBeenCalledWith('@@ -1,2 +1,3 @@\n const x = 1;\n+const y = 2;'); // Verify reviewCode was called with the patch
+
     expect(mockOctokit.rest.pulls.createReviewComment).toHaveBeenCalledWith(
       expect.objectContaining({
         owner: 'test-owner',
@@ -127,14 +139,14 @@ describe('AI Code Review Action', () => {
         pull_number: 1,
         commit_id: 'test-sha',
         path: 'src/test.ts',
-        body: expect.any(String),
+        body: 'Mocked review feedback', // Expect the mocked feedback
         line: expect.any(Number)
       })
     );
   });
 
   it('should handle push event review', async () => {
-    const mockContext: typeof github.context = { // Cast to the type of github.context
+    const mockContext: typeof github.context = { 
       eventName: 'push',
       payload: {
         before: 'before-sha',
@@ -142,22 +154,22 @@ describe('AI Code Review Action', () => {
         repository: { name: 'test-repo', owner: { login: 'test-owner' } }
       },
       repo: { owner: 'test-owner', repo: 'test-repo' },
-      sha: 'after-sha', // Added missing property
-      ref: 'refs/heads/main', // Added missing property
-      workflow: 'test-workflow', // Added missing property
-      action: 'test-action', // Added missing property
-      actor: 'test-actor', // Added missing property
-      runId: 456, // Added missing property
-      runNumber: 2, // Added missing property
-      runAttempt: 1, // Added missing property
-      apiUrl: 'https://api.github.com', // Added missing property
-      serverUrl: 'https://github.com', // Added missing property
-      graphqlUrl: 'https://api.github.com/graphql', // Added missing property
-      issue: { owner: 'test-owner', repo: 'test-repo', number: 1 }, // Added missing property
-      job: 'test-job', // Added missing property
+      sha: 'after-sha', 
+      ref: 'refs/heads/main', 
+      workflow: 'test-workflow', 
+      action: 'test-action', 
+      actor: 'test-actor', 
+      runId: 456, 
+      runNumber: 2, 
+      runAttempt: 1, 
+      apiUrl: 'https://api.github.com', 
+      serverUrl: 'https://github.com', 
+      graphqlUrl: 'https://api.github.com/graphql', 
+      issue: { owner: 'test-owner', repo: 'test-repo', number: 1 }, 
+      job: 'test-job', 
     };
 
-    const mockOctokit: GitHubClient = { // Explicitly type mockOctokit
+    const mockOctokit: GitHubClient = { 
       rest: {
         repos: {
           compareCommits: jest.fn().mockResolvedValue({
@@ -172,22 +184,17 @@ describe('AI Code Review Action', () => {
             }
           }),
           createCommitComment: jest.fn().mockResolvedValue({}),
-          // Add other methods that might be called, even if empty mocks
           get: jest.fn(),
           update: jest.fn(),
-          // ... add other repo methods if needed
         },
         pulls: {
           listFiles: jest.fn(),
           createReviewComment: jest.fn(),
-          // ... add other pull request methods if needed
         },
         issues: {
           createComment: jest.fn(),
-          // ... add other issue methods if needed
         },
       },
-      // Minimal mocks for other properties of the Octokit instance
       request: jest.fn(),
       graphql: jest.fn(),
       log: {
@@ -205,10 +212,10 @@ describe('AI Code Review Action', () => {
       auth: {
         hook: jest.fn(),
       },
-      paginate: jest.fn(), // Add paginate property
-    } as unknown as GitHubClient; // Final cast to ensure compatibility
+      paginate: jest.fn(), 
+    } as unknown as GitHubClient; 
 
-    (github.context as typeof github.context) = mockContext; // Cast to the type of github.context
+    (github.context as typeof github.context) = mockContext; 
     mockGetOctokit.mockReturnValue(mockOctokit);
 
     await run();
@@ -231,43 +238,39 @@ describe('AI Code Review Action', () => {
   });
 
   it('should handle empty file list', async () => {
-    const mockContext: typeof github.context = { // Cast to the type of github.context
+    const mockContext: typeof github.context = { 
       eventName: 'pull_request',
       payload: { pull_request: { number: 1, head: { sha: 'test-sha' } } },
       repo: { owner: 'test-owner', repo: 'test-repo' },
-      sha: 'test-sha', // Added missing property
-      ref: 'refs/pull/1/head', // Added missing property
-      workflow: 'test-workflow', // Added missing property
-      action: 'test-action', // Added missing property
-      actor: 'test-actor', // Added missing property
-      runId: 789, // Added missing property
-      runNumber: 3, // Added missing property
-      runAttempt: 1, // Added missing property
-      apiUrl: 'https://api.github.com', // Added missing property
-      serverUrl: 'https://github.com', // Added missing property
-      graphqlUrl: 'https://api.github.com/graphql', // Added missing property
-      issue: { owner: 'test-owner', repo: 'test-repo', number: 1 }, // Added missing property
-      job: 'test-job', // Added missing property
+      sha: 'test-sha', 
+      ref: 'refs/pull/1/head', 
+      workflow: 'test-workflow', 
+      action: 'test-action', 
+      actor: 'test-actor', 
+      runId: 789, 
+      runNumber: 3, 
+      runAttempt: 1, 
+      apiUrl: 'https://api.github.com', 
+      serverUrl: 'https://github.com', 
+      graphqlUrl: 'https://api.github.com/graphql', 
+      issue: { owner: 'test-owner', repo: 'test-repo', number: 1 }, 
+      job: 'test-job', 
     };
 
-    const mockOctokit: GitHubClient = { // Explicitly type mockOctokit
+    const mockOctokit: GitHubClient = { 
       rest: {
         pulls: {
           listFiles: jest.fn().mockResolvedValue({ data: [] }),
           createReviewComment: jest.fn(),
-          // ... add other pull request methods if needed
         },
         repos: {
           compareCommits: jest.fn(),
           createCommitComment: jest.fn(),
-          // ... add other repo methods if needed
         },
         issues: {
           createComment: jest.fn(),
-          // ... add other issue methods if needed
         },
       },
-      // Minimal mocks for other properties of the Octokit instance
       request: jest.fn(),
       graphql: jest.fn(),
       log: {
@@ -285,14 +288,14 @@ describe('AI Code Review Action', () => {
       auth: {
         hook: jest.fn(),
       },
-      paginate: jest.fn(), // Add paginate property
-    } as unknown as GitHubClient; // Final cast to ensure compatibility
+      paginate: jest.fn(), 
+    } as unknown as GitHubClient; 
 
-    (github.context as typeof github.context) = mockContext; // Cast to the type of github.context
+    (github.context as typeof github.context) = mockContext; 
     mockGetOctokit.mockReturnValue(mockOctokit);
 
     await run();
     expect(mockOctokit.rest.pulls.listFiles).toHaveBeenCalled();
-    expect(core.info).toHaveBeenCalledWith('No files to review');
+    expect(mockInfo).toHaveBeenCalledWith('No files to review'); // Use mockInfo here
   });
 });
