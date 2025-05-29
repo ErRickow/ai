@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { run } from '../src/index';
 import type { Context } from '@actions/github/lib/context';
-// import type { WebhookPayload } from '@actions/github/lib/interfaces';
+import type { Octokit } from '@actions/github/lib/octokit'; // Import Octokit type
 
 jest.mock('@actions/core');
 jest.mock('@actions/github');
@@ -41,7 +41,7 @@ describe('AI Code Review Action', () => {
       repo: { owner: 'test-owner', repo: 'test-repo' }
     } as unknown as Context;
 
-    // Mock Octokit responses
+    // Mock Octokit responses - include missing properties
     const mockOctokit = {
       rest: {
         pulls: {
@@ -56,8 +56,26 @@ describe('AI Code Review Action', () => {
           }),
           createReviewComment: jest.fn().mockResolvedValue({})
         }
-      }
-    };
+      },
+      // Add minimal mocks for the missing Octokit properties
+      request: jest.fn(),
+      graphql: jest.fn(),
+      log: {
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+      },
+      hook: {
+        before: jest.fn(),
+        after: jest.fn(),
+        error: jest.fn(),
+        wrap: jest.fn(),
+      },
+      auth: {
+        hook: jest.fn(),
+      },
+    } as unknown as Octokit; // Cast to Octokit
 
     // Apply mocks
     (github.context as Context) = mockContext;
@@ -112,8 +130,26 @@ describe('AI Code Review Action', () => {
           }),
           createCommitComment: jest.fn().mockResolvedValue({})
         }
-      }
-    };
+      },
+      // Add minimal mocks for the missing Octokit properties
+      request: jest.fn(),
+      graphql: jest.fn(),
+      log: {
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+      },
+      hook: {
+        before: jest.fn(),
+        after: jest.fn(),
+        error: jest.fn(),
+        wrap: jest.fn(),
+      },
+      auth: {
+        hook: jest.fn(),
+      },
+    } as unknown as Octokit; // Cast to Octokit
 
     (github.context as Context) = mockContext;
     mockGetOctokit.mockReturnValue(mockOctokit);
@@ -149,8 +185,26 @@ describe('AI Code Review Action', () => {
         pulls: {
           listFiles: jest.fn().mockResolvedValue({ data: [] })
         }
-      }
-    };
+      },
+      // Add minimal mocks for the missing Octokit properties
+      request: jest.fn(),
+      graphql: jest.fn(),
+      log: {
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+      },
+      hook: {
+        before: jest.fn(),
+        after: jest.fn(),
+        error: jest.fn(),
+        wrap: jest.fn(),
+      },
+      auth: {
+        hook: jest.fn(),
+      },
+    } as unknown as Octokit; // Cast to Octokit
 
     (github.context as Context) = mockContext;
     mockGetOctokit.mockReturnValue(mockOctokit);
