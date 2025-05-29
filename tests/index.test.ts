@@ -1,14 +1,16 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { run } from '../src/index';
-import type { Context } from '@actions/github/lib/context';
-//import type { Octokit } from '@actions/github/lib/octokit'; // Import Octokit type
+
+// Get the actual return type of github.getOctokit to ensure our mock matches it
+type GitHubClient = ReturnType<typeof github.getOctokit>;
 
 jest.mock('@actions/core');
 jest.mock('@actions/github');
 jest.mock('../src/providers/custom'); // Mock your AI provider
 
 describe('AI Code Review Action', () => {
+  // Cast mock functions to their correct types for better type inference
   const mockGetInput = core.getInput as jest.MockedFunction<typeof core.getInput>;
   const mockSetFailed = core.setFailed as jest.MockedFunction<typeof core.setFailed>;
   const mockGetOctokit = github.getOctokit as jest.MockedFunction<typeof github.getOctokit>;
@@ -39,10 +41,10 @@ describe('AI Code Review Action', () => {
         }
       },
       repo: { owner: 'test-owner', repo: 'test-repo' }
-    } as unknown as Context;
+    } as unknown as github.Context; // Use github.Context directly
 
-    // Mock Octokit responses - include missing properties
-    const mockOctokit = {
+    // Mock Octokit responses with all necessary properties for the type
+    const mockOctokit: GitHubClient = { // Explicitly type mockOctokit
       rest: {
         pulls: {
           listFiles: jest.fn().mockResolvedValue({
@@ -54,10 +56,24 @@ describe('AI Code Review Action', () => {
               }
             ]
           }),
-          createReviewComment: jest.fn().mockResolvedValue({})
-        }
+          createReviewComment: jest.fn().mockResolvedValue({}),
+          // Add other methods that might be called, even if empty mocks
+          get: jest.fn(),
+          update: jest.fn(),
+          // ... add other pull request methods if needed by the code under test
+        },
+        // Add minimal mocks for other top-level Octokit properties
+        repos: {
+          compareCommits: jest.fn(),
+          createCommitComment: jest.fn(),
+          // ... add other repo methods if needed
+        },
+        issues: {
+          createComment: jest.fn(),
+          // ... add other issue methods if needed
+        },
       },
-      // Add minimal mocks for the missing Octokit properties
+      // Minimal mocks for other properties of the Octokit instance
       request: jest.fn(),
       graphql: jest.fn(),
       log: {
@@ -75,10 +91,11 @@ describe('AI Code Review Action', () => {
       auth: {
         hook: jest.fn(),
       },
-    } as unknown // as Octokit; // Cast to Octokit
+      paginate: jest.fn(), // Add paginate property
+    } as unknown as GitHubClient; // Final cast to ensure compatibility
 
     // Apply mocks
-    (github.context as Context) = mockContext;
+    (github.context as github.Context) = mockContext;
     mockGetOctokit.mockReturnValue(mockOctokit);
 
     await run();
@@ -112,9 +129,9 @@ describe('AI Code Review Action', () => {
         repository: { name: 'test-repo', owner: { login: 'test-owner' } }
       },
       repo: { owner: 'test-owner', repo: 'test-repo' }
-    } as unknown as Context;
+    } as unknown as github.Context;
 
-    const mockOctokit = {
+    const mockOctokit: GitHubClient = { // Explicitly type mockOctokit
       rest: {
         repos: {
           compareCommits: jest.fn().mockResolvedValue({
@@ -128,10 +145,23 @@ describe('AI Code Review Action', () => {
               ]
             }
           }),
-          createCommitComment: jest.fn().mockResolvedValue({})
-        }
+          createCommitComment: jest.fn().mockResolvedValue({}),
+          // Add other methods that might be called, even if empty mocks
+          get: jest.fn(),
+          update: jest.fn(),
+          // ... add other repo methods if needed
+        },
+        pulls: {
+          listFiles: jest.fn(),
+          createReviewComment: jest.fn(),
+          // ... add other pull request methods if needed
+        },
+        issues: {
+          createComment: jest.fn(),
+          // ... add other issue methods if needed
+        },
       },
-      // Add minimal mocks for the missing Octokit properties
+      // Minimal mocks for other properties of the Octokit instance
       request: jest.fn(),
       graphql: jest.fn(),
       log: {
@@ -149,9 +179,10 @@ describe('AI Code Review Action', () => {
       auth: {
         hook: jest.fn(),
       },
-    } as unknown // as Octokit; // Cast to Octokit
+      paginate: jest.fn(), // Add paginate property
+    } as unknown as GitHubClient; // Final cast to ensure compatibility
 
-    (github.context as Context) = mockContext;
+    (github.context as github.Context) = mockContext;
     mockGetOctokit.mockReturnValue(mockOctokit);
 
     await run();
@@ -178,15 +209,26 @@ describe('AI Code Review Action', () => {
       eventName: 'pull_request',
       payload: { pull_request: { number: 1, head: { sha: 'test-sha' } } },
       repo: { owner: 'test-owner', repo: 'test-repo' }
-    } as unknown as Context;
+    } as unknown as github.Context;
 
-    const mockOctokit = {
+    const mockOctokit: GitHubClient = { // Explicitly type mockOctokit
       rest: {
         pulls: {
-          listFiles: jest.fn().mockResolvedValue({ data: [] })
-        }
+          listFiles: jest.fn().mockResolvedValue({ data: [] }),
+          createReviewComment: jest.fn(),
+          // ... add other pull request methods if needed
+        },
+        repos: {
+          compareCommits: jest.fn(),
+          createCommitComment: jest.fn(),
+          // ... add other repo methods if needed
+        },
+        issues: {
+          createComment: jest.fn(),
+          // ... add other issue methods if needed
+        },
       },
-      // Add minimal mocks for the missing Octokit properties
+      // Minimal mocks for other properties of the Octokit instance
       request: jest.fn(),
       graphql: jest.fn(),
       log: {
@@ -204,9 +246,10 @@ describe('AI Code Review Action', () => {
       auth: {
         hook: jest.fn(),
       },
-    } as unknown // as Octokit; // Cast to Octokit
+      paginate: jest.fn(), // Add paginate property
+    } as unknown as GitHubClient; // Final cast to ensure compatibility
 
-    (github.context as Context) = mockContext;
+    (github.context as github.Context) = mockContext;
     mockGetOctokit.mockReturnValue(mockOctokit);
 
     await run();
