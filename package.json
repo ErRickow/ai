@@ -21,7 +21,9 @@
   "dependencies": {
     "@actions/core": "^1.10.1",
     "@actions/github": "^6.0.0",
-    "axios": "^1.6.2"
+    "@google/generative-ai": "latest",
+    "axios": "^1.6.2",
+    "openai": "latest"
   },
   "devDependencies": {
     "@types/jest": "^29.5.10",
