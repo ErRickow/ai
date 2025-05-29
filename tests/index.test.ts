@@ -16,7 +16,8 @@ jest.mock('../src/providers/custom');
 describe('AI Code Review Action', () => {
   // Cast mock functions to their correct types for better type inference
   const mockGetInput = core.getInput as jest.MockedFunction<typeof core.getInput>;
-  const mockSetFailed = core.MockedFunction<typeof core.setFailed>; // Corrected type
+  // Corrected: Use jest.MockedFunction directly, not core.MockedFunction
+  const mockSetFailed = jest.MockedFunction<typeof core.setFailed>; 
   const mockInfo = core.info as jest.MockedFunction<typeof core.info>; // Mock core.info
   const mockGetOctokit = github.getOctokit as jest.MockedFunction<typeof github.getOctokit>;
 
@@ -138,8 +139,7 @@ describe('AI Code Review Action', () => {
         repo: 'test-repo',
         pull_number: 1,
         commit_id: 'test-sha',
-        path: 'src/test.ts',
-        body: 'Mocked review feedback', // Expect the mocked feedback
+        body: 'Mocked review feedback', 
         line: expect.any(Number)
       })
     );
@@ -296,6 +296,6 @@ describe('AI Code Review Action', () => {
 
     await run();
     expect(mockOctokit.rest.pulls.listFiles).toHaveBeenCalled();
-    expect(mockInfo).toHaveBeenCalledWith('No files to review'); // Use mockInfo here
+    expect(mockInfo).toHaveBeenCalledWith('No files to review'); 
   });
 });
