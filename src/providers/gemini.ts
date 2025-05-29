@@ -3,7 +3,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export class GeminiProvider implements BaseProvider {
   private genAI: GoogleGenerativeAI;
-  {
+  
+  constructor() {
     // Initialize without API key for default access
     this.genAI = new GoogleGenerativeAI();
   }
