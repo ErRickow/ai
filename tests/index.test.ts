@@ -1,6 +1,8 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { run } from '../src/index';
+import { Context } from '@actions/github/lib/context';
+import { WebhookPayload } from '@actions/github/lib/interfaces';
 
 jest.mock('@actions/core');
 jest.mock('@actions/github');
@@ -11,7 +13,7 @@ describe('AI Code Review Action', () => {
     jest.spyOn(core, 'getInput').mockImplementation((name: string) => {
       switch (name) {
         case 'custom_endpoint':
-          return 'https://api.example.com/chat';
+          return 'https://er-api.biz.id/luminai';
         case 'github_token':
           return 'test-token';
         default:
@@ -21,21 +23,22 @@ describe('AI Code Review Action', () => {
   });
 
   it('should handle pull request review', async () => {
-    const mockContext = {
+    const mockContext: Partial<Context> = {
       eventName: 'pull_request',
       payload: {
         pull_request: {
           number: 1,
           head: { sha: 'test-sha' }
         }
-      },
+      } as WebhookPayload,
       repo: {
         owner: 'test-owner',
         repo: 'test-repo'
       }
     };
 
-    (github.context as any) = mockContext;
+    (github.context as Context) = mockContext as Context;
+    
     const mockOctokit = {
       rest: {
         pulls: {
