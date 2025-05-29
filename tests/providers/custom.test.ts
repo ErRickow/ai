@@ -6,9 +6,9 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('CustomEndpointProvider', () => {
   const mockConfig = {
-    url: 'https://api.example.com/chat',
+    url: 'https://er-api.biz.id/luminai',
     queryParam: 'text',
-    headers: { 'Authorization': 'Bearer test-token' }
+ //   headers: { 'Authorization': 'Bearer test-token' }
   };
 
   beforeEach(() => {
@@ -24,8 +24,10 @@ describe('CustomEndpointProvider', () => {
 
     expect(result).toBe('Review feedback');
     expect(mockedAxios.get).toHaveBeenCalledWith(
-      expect.stringContaining(mockConfig.url),
-      expect.objectContaining({ headers: mockConfig.headers })
+      expect.stringContaining('https://er-api.biz.id/luminai'),
+      expect.objectContaining({
+        params: { text: 'const x = 1;' }
+      })
     );
   });
 
