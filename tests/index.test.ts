@@ -15,10 +15,11 @@ jest.mock('../src/providers/custom');
 
 describe('AI Code Review Action', () => {
   // Cast mock functions to their correct types for better type inference
+  // When mocking an entire module with jest.mock, the imported functions
+  // automatically become Jest mock functions. We just need to assert their types.
   const mockGetInput = core.getInput as jest.MockedFunction<typeof core.getInput>;
-  // Corrected: Use jest.MockedFunction directly, not core.MockedFunction
-  const mockSetFailed = jest.MockedFunction<typeof core.setFailed>; 
-  const mockInfo = core.info as jest.MockedFunction<typeof core.info>; // Mock core.info
+  const mockSetFailed = core.setFailed as jest.MockedFunction<typeof core.setFailed>; 
+  const mockInfo = core.info as jest.MockedFunction<typeof core.info>; 
   const mockGetOctokit = github.getOctokit as jest.MockedFunction<typeof github.getOctokit>;
 
   // Mock the CustomEndpointProvider constructor and its reviewCode method
