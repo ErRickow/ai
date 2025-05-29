@@ -10,27 +10,34 @@ jest.mock('@actions/github');
 describe('AI Code Review Action', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  it('should handle pull request review', async () => {
+    // Mock inputs
     jest.spyOn(core, 'getInput').mockImplementation((name: string) => {
       switch (name) {
         case 'custom_endpoint':
           return 'https://er-api.biz.id/luminai';
         case 'github_token':
           return 'test-token';
+        case 'custom_endpoint_param':
+          return 'text';
         default:
           return '';
       }
     });
-  });
 
-  it('should handle pull request review', async () => {
+    // Mock GitHub context
+    const mockPayload = {
+      pull_request: {
+        number: 1,
+        head: { sha: 'test-sha' }
+      }
+    } as WebhookPayload;
+
     const mockContext: Partial<Context> = {
       eventName: 'pull_request',
-      payload: {
-        pull_request: {
-          number: 1,
-          head: { sha: 'test-sha' }
-        }
-      } as WebhookPayload,
+      payload: mockPayload,
       repo: {
         owner: 'test-owner',
         repo: 'test-repo'
@@ -38,7 +45,8 @@ describe('AI Code Review Action', () => {
     };
 
     (github.context as Context) = mockContext as Context;
-    
+
+    // Mock Octokit
     const mockOctokit = {
       rest: {
         pulls: {
@@ -57,7 +65,19 @@ describe('AI Code Review Action', () => {
 
     await run();
 
-    expect(mockOctokit.rest.pulls.listFiles).toHaveBeenCalled();
-    expect(mockOctokit.rest.pulls.createReviewComment).toHaveBeenCalled();
+    expect(mockOctokit.rest.pulls.listFiles).toHaveBeenCalledWith({
+      owner: 'test-owner',
+      repo: 'test-repo',
+      pull_number: 1
+    });
+
+    expect(mockOctokit.rest.pulls.createReviewComment).toHaveBeenCalledWith(
+      expect.objectContaining({
+        owner: 'test-owner',
+        repo: 'test-repo',
+        pull_number: 1,
+        path: 'test.ts'
+      })
+    );
   });
 });
